@@ -7,7 +7,7 @@
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = user;
-  home.homeDirectory = "/home/${homedir}";
+  home.homeDirectory = homedir;
   dconf.settings = {
     "org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
@@ -53,6 +53,7 @@
     xclip
     nixd
     openssh
+    tailscale
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
     # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
@@ -173,6 +174,7 @@
          bind -T copy-mode-vi v send -X begin-selection
          bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "xclip -i -sel clipboard" # Linux
          set-option -g buffer-limit 102400 # Sets the buffer limit to 100 KB
+         set-option mouse
          set-option -sg escape-time 10
          set-option -g default-terminal "screen-256color"
          bind c new-window -c "#{pane_current_path}"
