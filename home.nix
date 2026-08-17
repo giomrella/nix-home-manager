@@ -13,13 +13,13 @@
       color-scheme = "prefer-dark";
     };
   };
-  gtk = {
-    enable = true;
-    theme = {
-      name = "Adwaita-dark";
-      package = pkgs.gnome-themes-extra;
-    };
-  };
+  # gtk = {
+  #   enable = true;
+  #   theme = {
+  #     name = "Adwaita-dark";
+  #     package = pkgs.gnome-themes-extra;
+  #   };
+  # };
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -28,7 +28,7 @@
   # You should not change this value, even if you update Home Manager. If you do
   # want to update the value, then make sure to first check the Home Manager
   # release notes.
-  home.stateVersion = "24.11"; # Please read the comment before changing.
+  home.stateVersion = "25.11"; # Please read the comment before changing.
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
@@ -38,6 +38,7 @@
     gnome-themes-extra
     ripgrep
     neovim
+    tree-sitter
     nodejs_22
     rustup
     nixfmt-rfc-style
@@ -53,7 +54,9 @@
     xclip
     nixd
     openssh
-    x2goclient
+    x2goclient # graphical ssh
+    ksnip # screenshot markup
+    azure-cli
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
     # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
@@ -115,9 +118,9 @@
       set path+=.github/**
     '';
     ".bash_profile".text = ''
-    if [ -f "$HOME/.bashrc" ]; then
-        . "$HOME/.bashrc"
-    fi
+      if [ -f "$HOME/.bashrc" ]; then
+          . "$HOME/.bashrc"
+      fi
     '';
     ".bashrctest".text = ''
     # the below gives a shell level counter in the prompt string to see if you have 
@@ -164,27 +167,39 @@
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
+  programs.ghostty = {
+    enable = true;
+    settings = {
+      mouse-scroll-multiplier = 0.2; # scrolling waaaay too fast
+      font-size = 10;
+    };
+  };
   programs.tmux = {
-       enable = true;
-       clock24 = true;
-       terminal = "tmux-256color";
-       extraConfig = ''
-         set-option -ga terminal-overrides ",*256col*:Tc:RGB"
-         set-window-option -g mode-keys vi
-         bind -T copy-mode-vi v send -X begin-selection
-         bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "xclip -i -sel clipboard" # Linux
-         set-option -g buffer-limit 102400 # Sets the buffer limit to 100 KB
-         set-option mouse
-         set-option -sg escape-time 10
-         set-option -g default-terminal "screen-256color"
-         bind c new-window -c "#{pane_current_path}"
-         bind '"' split-window -c "#{pane_current_path}"
-         bind % split-window -h -c "#{pane_current_path}"
-         bind-key Up select-pane -U
-         bind-key Down select-pane -D
-         bind-key Left select-pane -L
-         bind-key Right select-pane -R
-       '';
+    enable = true;
+    clock24 = true;
+    terminal = "tmux-256color";
+    shell = "${pkgs.bash}/bin/bash";
+    extraConfig = ''
+          set-option -g mouse on
+          set-option -g mode-keys vi
+          bind -T copy-mode-vi v send -X begin-selection
+          bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "xclip -i -sel clipboard"
+          set-option -g buffer-limit 102400
+          set-option -sg escape-time 10
+          set-option -g default-terminal "tmux-256color"
+          set-option -ga terminal-overrides ",xterm-256color:Tc"
+
+          # Safe window/pane bindings
+          bind c if-shell 'tmux display-message -p "#S"' \
+              "new-window -c '#{pane_current_path}'" \
+              "new-window"
+          bind '"' split-window -h -c "#{pane_current_path}"
+          bind % split-window -v -c "#{pane_current_path}"
+          bind-key Up select-pane -U
+          bind-key Down select-pane -D
+          bind-key Left select-pane -L
+          bind-key Right select-pane -R
+    '';
   };
 
   programs.kitty = {
