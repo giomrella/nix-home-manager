@@ -50,13 +50,16 @@
     uv
     jq
     tree
-    gemini-cli
     xclip
     nixd
     openssh
     x2goclient # graphical ssh
     ksnip # screenshot markup
-    azure-cli
+    (azure-cli.withExtensions [
+     azure-cli-extensions.datashare
+    ])
+    kubectl # manage k8s cluster
+    kubelogin # login to k8s cluster
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
     # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
@@ -180,6 +183,8 @@
     terminal = "tmux-256color";
     shell = "${pkgs.bash}/bin/bash";
     extraConfig = ''
+          # renumber windows so they are always 0-9 sequentially
+          set-option -g renumber-windows on
           set-option -g mouse on
           set-option -g mode-keys vi
           bind -T copy-mode-vi v send -X begin-selection
