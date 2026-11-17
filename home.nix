@@ -145,6 +145,7 @@
     alias docker_logs_latest='docker logs "$(docker ps -aql)"'
     alias keybindings='gsettings list-recursively | grep -i keybindings'
     alias cb='xclip -sel clipboard'
+    alias hms='home-manager switch --impure'
     '';
   };
 
